@@ -10,7 +10,7 @@ append :linked_files, "config/database.yml", "config/secrets.yml"
 append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "vendor/bundle", "public/system", "public/uploads"
 
 # Default branch is :master
-# ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
+ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
 # Default deploy_to directory is /var/www/my_app_name
 # set :deploy_to, "/var/www/my_app_name"
@@ -36,3 +36,15 @@ append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "vendor/bund
 
 # Default value for keep_releases is 5
 # set :keep_releases, 5
+
+namespace :deploy do
+  desc "seed database"
+  task :seed do
+    on roles(:db) do |host|
+      within release_path do
+        execute :rake, "db:seed"
+      end
+    end
+  end
+  after :migrate, :seed
+end
